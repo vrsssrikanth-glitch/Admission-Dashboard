@@ -233,46 +233,6 @@ st.plotly_chart(
     use_container_width=True
 )
 
-# ----------------------------------------------------
-# Department Pie Chart
-# ----------------------------------------------------
-
-st.markdown("### 🥧 Department Occupancy")
-
-selected_branch = st.selectbox(
-    "Select Department",
-    sorted(display_status["Department"].unique())
-)
-
-branch_data = display_status[
-    display_status["Department"] == selected_branch
-].iloc[0]
-
-pie_df = pd.DataFrame({
-    "Status": ["Filled", "Vacant"],
-    "Seats": [
-        branch_data["Filled"],
-        branch_data["Vacant"]
-    ]
-})
-
-fig_pie = px.pie(
-    pie_df,
-    names="Status",
-    values="Seats",
-    hole=0.45,
-    title=f"{selected_branch} Seat Occupancy"
-)
-
-fig_pie.update_traces(
-    textposition="inside",
-    textinfo="percent+label+value"
-)
-
-st.plotly_chart(
-    fig_pie,
-    use_container_width=True
-)
 
 # ----------------------------------------------------
 # Department Summary Table
