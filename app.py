@@ -78,12 +78,10 @@ students["Reference"] = (
 # ----------------------------------------------------
 
 students["Date of Joining"] = pd.to_datetime(
-
-    students["Date of Joining"],
-
-    format="mixed",
-
+    students["Date of Joining"].astype(str).str.strip(),
+    format="%d/%m/%Y",
     errors="coerce"
+)
 
 )
 # ----------------------------------------------------
@@ -258,44 +256,40 @@ st.subheader("📈 Day-wise Admission Trend")
 trend = (
     students
     .dropna(subset=["Date of Joining"])
-    .groupby(
-        students["Date of Joining"].dt.date
-    )
+    .groupby("Date of Joining")
     .size()
     .reset_index(name="Admissions")
+    .sort_values("Date of Joining")
 )
 
-trend.columns = [
-    "Date",
-    "Admissions"
-]
+fig = px.line(
+    trend,
+    x="Date of Joining",
+    y="Admissions",
+    markers=True,
+    title="Day-wise Admissions"
+)
 
-if len(trend) > 0:
+fig.update_traces(
+    mode="lines+markers+text",
+    text=trend["Admissions"],
+    textposition="top center"
+)
 
-    fig = px.line(
-        trend,
-        x="Date",
-        y="Admissions",
-        markers=True,
-        title="Daily Admissions"
-    )
+fig.update_layout(
+    xaxis_title="Admission Date",
+    yaxis_title="Number of Admissions",
+    xaxis=dict(
+        tickformat="%d/%m/%Y",
+        tickangle=-45
+    ),
+    height=500
+)
 
-    fig.update_layout(
-        xaxis_title="Admission Date",
-        yaxis_title="Number of Admissions",
-        height=450
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
-
-else:
-
-    st.info("No admission dates available.")
-
-st.markdown("---")
+st.plotly_chart(
+    fig,
+    use_container_width=True
+)
 
 # ----------------------------------------------------
 # FACULTY SEARCH
