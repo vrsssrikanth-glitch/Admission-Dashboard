@@ -48,6 +48,15 @@ try:
     students = pd.read_csv(admission_file)
     intake = pd.read_csv(intake_file)
 
+    # Remove all 'Unnamed' columns
+    students = students.loc[
+        :, ~students.columns.str.contains("^Unnamed", case=False)
+    ]
+
+    intake = intake.loc[
+        :, ~intake.columns.str.contains("^Unnamed", case=False)
+    ]
+
 except Exception as e:
 
     st.error(f"Unable to read CSV files.\n\n{e}")
