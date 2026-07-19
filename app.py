@@ -259,8 +259,9 @@ st.markdown("---")
 # DAY-WISE ADMISSION TREND
 # ----------------------------------------------------
 
-st.subheader("📈 Day-wise Admission Trend")
+st.subheader("📅 Day-wise Admission Trend")
 
+# Remove invalid dates
 trend = (
     students
     .dropna(subset=["Date of Joining"])
@@ -270,35 +271,34 @@ trend = (
     .sort_values("Date of Joining")
 )
 
-fig = px.line(
+# Format dates as dd/mm/yyyy for display
+trend["Display Date"] = trend["Date of Joining"].dt.strftime("%d/%m/%Y")
+
+fig = px.bar(
     trend,
-    x="Date of Joining",
+    x="Display Date",
     y="Admissions",
-    markers=True,
-    title="Day-wise Admissions"
+    text="Admissions",
+    title="Admissions by Date"
 )
 
 fig.update_traces(
-    mode="lines+markers+text",
-    text=trend["Admissions"],
-    textposition="top center"
+    textposition="outside",
+    marker_color="#1565C0"
 )
 
 fig.update_layout(
     xaxis_title="Admission Date",
     yaxis_title="Number of Admissions",
-    xaxis=dict(
-        tickformat="%d/%m/%Y",
-        tickangle=-45
-    ),
-    height=500
+    xaxis_tickangle=-45,
+    height=500,
+    bargap=0.25
 )
 
 st.plotly_chart(
     fig,
     use_container_width=True
 )
-
 # ----------------------------------------------------
 # FACULTY SEARCH
 # ----------------------------------------------------
