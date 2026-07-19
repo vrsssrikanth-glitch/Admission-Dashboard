@@ -183,31 +183,37 @@ st.markdown("---")
 # ----------------------------------------------------
 
 st.subheader("🏫 Department Seat Status")
+selected_branch = st.selectbox(
+    "Select Department",
+    sorted(seat_status["Branch"].unique())
+)
 
-display_status = seat_status.copy()
+branch_data = seat_status[
+    seat_status["Branch"] == selected_branch
+].iloc[0]
 
-display_status = display_status[
-    [
-        "Branch",
-        "Total Intake",
-        "Filled",
-        "Vacant",
-        "Percentage"
+pie_df = pd.DataFrame({
+
+    "Status": ["Filled", "Vacant"],
+
+    "Seats": [
+        branch_data["Filled"],
+        branch_data["Vacant"]
     ]
-]
 
-display_status.columns = [
-    "Branch",
-    "Intake",
-    "Filled",
-    "Vacant",
-    "Filled %"
-]
+})
 
-st.dataframe(
-    display_status,
-    use_container_width=True,
-    hide_index=True
+fig_pie = px.pie(
+    pie_df,
+    names="Status",
+    values="Seats",
+    hole=0.45,
+    title=f"{selected_branch} Seat Status"
+)
+
+st.plotly_chart(
+    fig_pie,
+    use_container_width=True
 )
 
 st.markdown("### Seat Occupancy")
