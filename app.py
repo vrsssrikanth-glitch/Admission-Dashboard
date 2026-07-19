@@ -83,7 +83,6 @@ students["Date of Joining"] = pd.to_datetime(
     errors="coerce"
 )
 
-)
 # ----------------------------------------------------
 # NUMERIC CONVERSION
 # ----------------------------------------------------
