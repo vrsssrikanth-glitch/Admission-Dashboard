@@ -78,11 +78,14 @@ students["Reference"] = (
 # ----------------------------------------------------
 
 students["Date of Joining"] = pd.to_datetime(
-    students["Date of Joining"],
-    errors="coerce",
-    dayfirst=True
-)
 
+    students["Date of Joining"],
+
+    format="mixed",
+
+    errors="coerce"
+
+)
 # ----------------------------------------------------
 # NUMERIC CONVERSION
 # ----------------------------------------------------
@@ -183,24 +186,74 @@ st.markdown("---")
 # ----------------------------------------------------
 
 st.subheader("🏫 Department Seat Status")
-selected_branch = st.selectbox(
-    "Select Department",
-    sorted(seat_status["Branch"].unique())
+
+# Prepare display table
+display_status = seat_status[
+    ["Branch", "Total Intake", "Filled", "Vacant", "Percentage"]
+].copy()
+
+display_status.columns = [
+    "Department",
+    "Intake",
+    "Filled",
+    "Vacant",
+    "Filled %"
+]
+
+# ----------------------------------------------------
+# Filled vs Vacant Seats (Stacked Horizontal Bar)
+# ----------------------------------------------------
+
+st.markdown("### 📊 Filled vs Vacant Seats")
+
+bar_df = display_status.rename(
+    columns={"Department": "Branch"}
 )
 
-branch_data = seat_status[
-    seat_status["Branch"] == selected_branch
+fig_bar = px.bar(
+    bar_df,
+    y="Branch",
+    x=["Filled", "Vacant"],
+    orientation="h",
+    title="Department-wise Filled and Vacant Seats",
+    text_auto=True,
+    color_discrete_sequence=["#2E8B57", "#DC143C"]
+)
+
+fig_bar.update_layout(
+    height=500,
+    xaxis_title="Number of Seats",
+    yaxis_title="Department",
+    legend_title="Seat Status",
+    barmode="stack"
+)
+
+st.plotly_chart(
+    fig_bar,
+    use_container_width=True
+)
+
+# ----------------------------------------------------
+# Department Pie Chart
+# ----------------------------------------------------
+
+st.markdown("### 🥧 Department Occupancy")
+
+selected_branch = st.selectbox(
+    "Select Department",
+    sorted(display_status["Department"].unique())
+)
+
+branch_data = display_status[
+    display_status["Department"] == selected_branch
 ].iloc[0]
 
 pie_df = pd.DataFrame({
-
     "Status": ["Filled", "Vacant"],
-
     "Seats": [
         branch_data["Filled"],
         branch_data["Vacant"]
     ]
-
 })
 
 fig_pie = px.pie(
@@ -208,7 +261,12 @@ fig_pie = px.pie(
     names="Status",
     values="Seats",
     hole=0.45,
-    title=f"{selected_branch} Seat Status"
+    title=f"{selected_branch} Seat Occupancy"
+)
+
+fig_pie.update_traces(
+    textposition="inside",
+    textinfo="percent+label+value"
 )
 
 st.plotly_chart(
@@ -216,21 +274,20 @@ st.plotly_chart(
     use_container_width=True
 )
 
-st.markdown("### Seat Occupancy")
+# ----------------------------------------------------
+# Department Summary Table
+# ----------------------------------------------------
 
-for _, row in display_status.iterrows():
+st.markdown("### 📋 Department Summary")
 
-    st.write(
-        f"**{row['Branch']}** : "
-        f"{int(row['Filled'])} / {int(row['Intake'])} "
-        f"({row['Filled %']}%)"
-    )
-
-    st.progress(
-        min(float(row["Filled %"]) / 100, 1.0)
-    )
+st.dataframe(
+    display_status,
+    use_container_width=True,
+    hide_index=True
+)
 
 st.markdown("---")
+
 
 # ----------------------------------------------------
 # DAY-WISE ADMISSION TREND
