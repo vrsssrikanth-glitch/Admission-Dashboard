@@ -217,7 +217,7 @@ fig_bar = px.bar(
     orientation="h",
     title="Department-wise Filled and Vacant Seats",
     text_auto=True,
-    color_discrete_sequence=["#2E8B57", "#DC143C"]
+    color_discrete_sequence=["#87CEFA", "#1F4E79"]
 )
 
 fig_bar.update_layout(
